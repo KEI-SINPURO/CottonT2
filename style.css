@@ -1,0 +1,123 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+    background: radial-gradient(circle at center, #1a1a2e 0%, #0a0a15 100%);
+    overflow: hidden;
+    width: 100vw;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+#canvas {
+    border-radius: 50%;
+    box-shadow: 0 20px 80px rgba(0, 0, 0, 0.8);
+    max-width: 90vw;
+    max-height: 50vh;
+    margin-bottom: 40px;
+}
+
+.transcript-container {
+    width: 90%;
+    max-width: 500px;
+    min-height: 120px;
+    padding: 20px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.transcript {
+    color: #ffffff;
+    font-size: 16px;
+    line-height: 1.6;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.transcript.active {
+    opacity: 1;
+}
+
+.start-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 20px 40px;
+    border-radius: 50px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.start-button:active {
+    transform: translate(-50%, -50%) scale(0.95);
+}
+
+.start-button.hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+
+@media (max-width: 600px) {
+    #canvas {
+        width: 280px;
+        height: 280px;
+    }
+    
+    .transcript {
+        font-size: 14px;
+    }
+    
+    .transcript-container {
+        padding: 15px;
+        min-height: 100px;
+    }
+}
+.start-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+    cursor: pointer;
+}
+
+.start-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.5s ease;
+}
