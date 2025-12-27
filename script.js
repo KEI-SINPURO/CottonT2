@@ -20,7 +20,6 @@ const centerY = canvas.height / 2;
 const numWaves = 180;
 
 const transcriptData = [
-    { time: 0, text: "" },
     { time: 0.1, text: "こちらはユニクロのコットン100％使用の半袖シャツです。" },
     { time: 5.5, text: "素材はハリ感のある、カジュアルなコットンで、肌ざわりがとても柔らかくて快適です。" },
     { time: 12.5, text: "シャツの生地は厚すぎず程よい厚みで、年間を通して着やすいです。" },
