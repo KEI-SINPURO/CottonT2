@@ -31,7 +31,7 @@ const transcriptData = [
     { time: 37.5, text: "カジュアルな場面で着ることができる1着です。" }
 ];
 
-let currentTranscriptIndex = 0;
+let currentTranscriptIndex = -1;
 
 function initAudioAnalyser() {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -48,6 +48,14 @@ function initAudioAnalyser() {
 
 function updateTranscript() {
     const currentTime = audio.currentTime;
+    
+    // 最初のテキストを即座に表示
+    if (currentTime < 0.1 && currentTranscriptIndex === -1) {
+        currentTranscriptIndex = 0;
+        transcript.textContent = transcriptData[0].text;
+        transcript.classList.add('active');
+        return;
+    }
     
     for (let i = transcriptData.length - 1; i >= 0; i--) {
         if (currentTime >= transcriptData[i].time) {
