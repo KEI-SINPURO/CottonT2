@@ -20,18 +20,129 @@ const centerX = canvas.width / 2;
 const centerY = canvas.height / 2;
 const numWaves = 180;
 
-const transcriptData = [
-    { time: 0.1, text: "こちらはユニクロのコットン100％使用の半袖シャツです。" },
-    { time: 4, text: "素材はハリ感のある、カジュアルなコットンで、肌ざわりがとても柔らかくて快適です。" },
-    { time: 12, text: "シャツの生地は厚すぎず程よい厚みで、年間を通して着やすいです。" },
-    { time: 18.5, text: "色は白に近い無地で、黒色の花柄模様が描かれています。" },
-    { time: 24.5, text: "デザインはシンプルで、襟もついています。" },
-    { time: 28, text: "そのため、きちんと感があります。" },
-    { time: 31, text: "形はやや細身でスマートなシルエットですが、動きやすさも考えられています。" },
-    { time: 37, text: "カジュアルな場面で着ることができる1着です。" }
-];
+// 音声データベース - 各QRコードに対応する音声と字幕
+const audioDatabase = {
+    'cotton-white': {
+        file: 'CottonT-AI.mp3',
+        title: 'コットンシャツ（白）',
+        transcripts: [
+            { time: 0.1, text: "こちらはユニクロのコットン100％使用の半袖シャツです。" },
+            { time: 4, text: "素材はハリ感のある、カジュアルなコットンで、肌ざわりがとても柔らかくて快適です。" },
+            { time: 12, text: "シャツの生地は厚すぎず程よい厚みで、年間を通して着やすいです。" },
+            { time: 18.5, text: "色は白に近い無地で、黒色の花柄模様が描かれています。" },
+            { time: 24.5, text: "デザインはシンプルで、襟もついています。" },
+            { time: 28, text: "そのため、きちんと感があります。" },
+            { time: 31, text: "形はやや細身でスマートなシルエットですが、動きやすさも考えられています。" },
+            { time: 37, text: "カジュアルな場面で着ることができる1着です。" }
+        ]
+    },
+    'denim-blue': {
+        file: 'denim-jacket.mp3',
+        title: 'デニムジャケット（青）',
+        transcripts: [
+            { time: 0.1, text: "こちらはユニクロのデニムジャケットです。" },
+            { time: 3, text: "素材は厚手のデニム生地で、耐久性に優れています。" },
+            { time: 7, text: "色は深みのあるインディゴブルーです。" },
+            { time: 10, text: "デザインはクラシックなGジャンスタイル。" },
+            { time: 13, text: "胸ポケットが2つ、サイドポケットが2つ付いています。" },
+            { time: 17, text: "金属ボタンが特徴的で、カジュアルな雰囲気を演出します。" },
+            { time: 22, text: "春秋のアウターとして最適な1着です。" }
+        ]
+    },
+    'polo-red': {
+        file: 'polo-shirt.mp3',
+        title: 'ポロシャツ（赤）',
+        transcripts: [
+            { time: 0.1, text: "こちらはユニクロのポロシャツです。" },
+            { time: 3, text: "素材は吸汗速乾機能のあるポリエステル混紡です。" },
+            { time: 7, text: "色は鮮やかなレッドで、元気な印象を与えます。" },
+            { time: 11, text: "襟と袖口にリブ編みが施されています。" },
+            { time: 15, text: "胸元には3つのボタンが付いています。" },
+            { time: 18, text: "スポーツやアウトドアに最適な機能性です。" },
+            { time: 22, text: "カジュアルからビジネスカジュアルまで幅広く使える1着です。" }
+        ]
+    },
+    'sweater-gray': {
+        file: 'sweater.mp3',
+        title: 'セーター（グレー）',
+        transcripts: [
+            { time: 0.1, text: "こちらはユニクロのウールセーターです。" },
+            { time: 3, text: "素材は上質なメリノウール100％です。" },
+            { time: 7, text: "色は落ち着いたライトグレーです。" },
+            { time: 10, text: "首元はクルーネックで、シンプルなデザインです。" },
+            { time: 14, text: "編み目は細かく、滑らかな手触りです。" },
+            { time: 18, text: "保温性に優れ、秋冬に活躍します。" },
+            { time: 22, text: "ビジネスからカジュアルまで対応できる万能な1着です。" }
+        ]
+    },
+    'tshirt-black': {
+        file: 'tshirt.mp3',
+        title: 'Tシャツ（黒）',
+        transcripts: [
+            { time: 0.1, text: "こちらはユニクロのベーシックTシャツです。" },
+            { time: 3, text: "素材は柔らかいコットン100％です。" },
+            { time: 6, text: "色は定番のブラックで、どんなコーディネートにも合わせやすいです。" },
+            { time: 11, text: "首元は丈夫なリブ編みクルーネックです。" },
+            { time: 15, text: "シルエットはレギュラーフィットで、快適な着心地です。" },
+            { time: 19, text: "インナーとしても1枚でも着られる定番アイテムです。" }
+        ]
+    },
+    // デモ用（音声ファイルがない場合）
+    'demo': {
+        file: null,
+        title: 'デモ音声',
+        transcripts: [
+            { time: 0.1, text: "これはデモンストレーションです。" },
+            { time: 3, text: "実際の音声ファイルを追加してください。" }
+        ]
+    }
+};
 
+let currentTranscriptData = [];
 let currentTranscriptIndex = -1;
+let currentAudioId = null;
+
+// URLパラメータから音声IDを取得
+function getAudioIdFromURL() {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get('id') || 'demo';
+}
+
+// 音声データを読み込む
+function loadAudioData(audioId) {
+    currentAudioId = audioId;
+    const audioData = audioDatabase[audioId];
+    
+    if (!audioData) {
+        console.error('音声データが見つかりません:', audioId);
+        // デフォルトのデモ音声を使用
+        currentTranscriptData = audioDatabase['demo'].transcripts;
+        startBtn.textContent = '音声ファイルが見つかりません';
+        return false;
+    }
+    
+    currentTranscriptData = audioData.transcripts;
+    
+    // タイトルを表示
+    if (document.getElementById('btnText')) {
+        document.getElementById('btnText').textContent = audioData.title;
+    }
+    
+    // 音声ファイルを設定
+    if (audioData.file) {
+        const source = audio.querySelector('source');
+        if (source) {
+            source.src = audioData.file;
+            audio.load();
+            console.log('音声ファイル読み込み:', audioData.file);
+        }
+        return true;
+    } else {
+        console.warn('音声ファイルが設定されていません');
+        startBtn.textContent = 'タップして開始（音声なし）';
+        return false;
+    }
+}
 
 function initAudioAnalyser() {
     audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -50,17 +161,19 @@ function updateTranscript() {
     const currentTime = audio.currentTime;
     
     if (currentTime < 0.1 && currentTranscriptIndex === -1) {
-        currentTranscriptIndex = 0;
-        transcript.textContent = transcriptData[0].text;
-        transcript.classList.add('active');
+        if (currentTranscriptData.length > 0) {
+            currentTranscriptIndex = 0;
+            transcript.textContent = currentTranscriptData[0].text;
+            transcript.classList.add('active');
+        }
         return;
     }
     
-    for (let i = transcriptData.length - 1; i >= 0; i--) {
-        if (currentTime >= transcriptData[i].time) {
+    for (let i = currentTranscriptData.length - 1; i >= 0; i--) {
+        if (currentTime >= currentTranscriptData[i].time) {
             if (currentTranscriptIndex !== i) {
                 currentTranscriptIndex = i;
-                transcript.textContent = transcriptData[i].text;
+                transcript.textContent = currentTranscriptData[i].text;
                 transcript.classList.add('active');
             }
             break;
@@ -180,16 +293,14 @@ function startAudio() {
         audioContext.resume();
     }
     
-    // 音声を再生
     audio.play().then(() => {
         isPlaying = true;
         startTime = Date.now();
         startOverlay.classList.add('hidden');
-        
-        console.log('音声再生開始');
+        console.log('音声再生開始:', currentAudioId);
     }).catch(err => {
         console.error('音声再生エラー:', err);
-        // エラー時でもオーバーレイは非表示にする
+        alert('音声の再生に失敗しました。音声ファイルを確認してください。');
         startOverlay.classList.add('hidden');
     });
 }
@@ -199,28 +310,28 @@ audio.addEventListener('ended', () => {
     transcript.classList.remove('active');
 });
 
-// 画面全体のクリック/タップで再生開始
 startOverlay.addEventListener('click', startAudio);
 startBtn.addEventListener('click', (e) => {
     e.stopPropagation();
     startAudio();
 });
 
-// アニメーション開始
 startTime = Date.now();
 animate();
 
-// 自動再生の処理
+// ページ読み込み時に音声データを設定
 window.addEventListener('DOMContentLoaded', () => {
+    const audioId = getAudioIdFromURL();
+    console.log('音声ID:', audioId);
+    
+    const loaded = loadAudioData(audioId);
+    
     const urlParams = new URLSearchParams(window.location.search);
     const autoplay = urlParams.get('autoplay');
     
-    console.log('Autoplay parameter:', autoplay);
-    
-    if (autoplay === 'true') {
+    if (autoplay === 'true' && loaded) {
         console.log('自動再生を試行します');
         
-        // 自動再生を複数回試行
         let attemptCount = 0;
         const maxAttempts = 3;
         
@@ -228,7 +339,6 @@ window.addEventListener('DOMContentLoaded', () => {
             attemptCount++;
             console.log(`自動再生試行 ${attemptCount}/${maxAttempts}`);
             
-            // AudioContextの初期化
             if (!audioContext) {
                 try {
                     initAudioAnalyser();
@@ -237,40 +347,34 @@ window.addEventListener('DOMContentLoaded', () => {
                 }
             }
             
-            // AudioContextの再開
             if (audioContext && audioContext.state === 'suspended') {
-                audioContext.resume().then(() => {
-                    console.log('AudioContext resumed');
-                });
+                audioContext.resume();
             }
             
-            // 音声の再生試行
             audio.play().then(() => {
                 console.log('自動再生成功！');
                 isPlaying = true;
                 startTime = Date.now();
                 startOverlay.classList.add('hidden');
             }).catch(err => {
-                console.error(`自動再生失敗 (試行${attemptCount}):`, err.name, err.message);
+                console.error(`自動再生失敗 (試行${attemptCount}):`, err);
                 
                 if (attemptCount < maxAttempts) {
-                    // 次の試行を遅延実行
                     setTimeout(attemptAutoplay, 500);
                 } else {
-                    console.log('自動再生に失敗しました。ボタン表示を維持します。');
-                    // ボタンのテキストを変更
-                    startBtn.textContent = 'タップして再生';
+                    console.log('自動再生に失敗しました。ボタンを表示します。');
                     startBtn.style.animation = 'pulse 2s infinite';
                 }
             });
         }
         
-        // 少し遅延してから自動再生を試行
         setTimeout(attemptAutoplay, 100);
     }
 });
 
-// ボタンのパルスアニメーション用CSS（JavaScriptで動的に追加）
+// デバッグ用：利用可能な音声IDを表示
+console.log('利用可能な音声ID:', Object.keys(audioDatabase));
+
 const style = document.createElement('style');
 style.textContent = `
     @keyframes pulse {
