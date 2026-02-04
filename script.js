@@ -205,3 +205,14 @@ startBtn.addEventListener('click', (e) => {
 
 startTime = Date.now();
 animate();
+
+// URLパラメータで自動再生を検出
+window.addEventListener('load', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('autoplay') === 'true') {
+        // 自動再生を実行
+        setTimeout(() => {
+            startAudio();
+        }, 500); // 0.5秒待ってから再生
+    }
+});
