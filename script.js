@@ -3,6 +3,7 @@ const ctx = canvas.getContext('2d');
 const audio = document.getElementById('audio');
 const transcript = document.getElementById('transcript');
 const startBtn = document.getElementById('startBtn');
+const startOverlay = document.getElementById('startOverlay');
 
 canvas.width = 400;
 canvas.height = 400;
@@ -48,7 +49,6 @@ function initAudioAnalyser() {
 function updateTranscript() {
     const currentTime = audio.currentTime;
     
-    // 最初のテキストを即座に表示
     if (currentTime < 0.1 && currentTranscriptIndex === -1) {
         currentTranscriptIndex = 0;
         transcript.textContent = transcriptData[0].text;
@@ -180,14 +180,17 @@ function startAudio() {
         audioContext.resume();
     }
     
+    // 音声を再生
     audio.play().then(() => {
         isPlaying = true;
         startTime = Date.now();
-        document.getElementById('startOverlay').classList.add('hidden');
-        animate();
+        startOverlay.classList.add('hidden');
+        
+        console.log('音声再生開始');
     }).catch(err => {
         console.error('音声再生エラー:', err);
-        alert('音声の再生に失敗しました。音声ファイル(voice.mp3)を配置してください。');
+        // エラー時でもオーバーレイは非表示にする
+        startOverlay.classList.add('hidden');
     });
 }
 
@@ -197,22 +200,88 @@ audio.addEventListener('ended', () => {
 });
 
 // 画面全体のクリック/タップで再生開始
-document.getElementById('startOverlay').addEventListener('click', startAudio);
+startOverlay.addEventListener('click', startAudio);
 startBtn.addEventListener('click', (e) => {
-    e.stopPropagation(); // ボタンのクリックイベントが重複しないように
+    e.stopPropagation();
     startAudio();
 });
 
+// アニメーション開始
 startTime = Date.now();
 animate();
 
-// URLパラメータで自動再生を検出
-window.addEventListener('load', () => {
+// 自動再生の処理
+window.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('autoplay') === 'true') {
-        // 自動再生を実行
-        setTimeout(() => {
-            startAudio();
-        }, 500); // 0.5秒待ってから再生
+    const autoplay = urlParams.get('autoplay');
+    
+    console.log('Autoplay parameter:', autoplay);
+    
+    if (autoplay === 'true') {
+        console.log('自動再生を試行します');
+        
+        // 自動再生を複数回試行
+        let attemptCount = 0;
+        const maxAttempts = 3;
+        
+        function attemptAutoplay() {
+            attemptCount++;
+            console.log(`自動再生試行 ${attemptCount}/${maxAttempts}`);
+            
+            // AudioContextの初期化
+            if (!audioContext) {
+                try {
+                    initAudioAnalyser();
+                } catch (err) {
+                    console.error('AudioContext初期化エラー:', err);
+                }
+            }
+            
+            // AudioContextの再開
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume().then(() => {
+                    console.log('AudioContext resumed');
+                });
+            }
+            
+            // 音声の再生試行
+            audio.play().then(() => {
+                console.log('自動再生成功！');
+                isPlaying = true;
+                startTime = Date.now();
+                startOverlay.classList.add('hidden');
+            }).catch(err => {
+                console.error(`自動再生失敗 (試行${attemptCount}):`, err.name, err.message);
+                
+                if (attemptCount < maxAttempts) {
+                    // 次の試行を遅延実行
+                    setTimeout(attemptAutoplay, 500);
+                } else {
+                    console.log('自動再生に失敗しました。ボタン表示を維持します。');
+                    // ボタンのテキストを変更
+                    startBtn.textContent = 'タップして再生';
+                    startBtn.style.animation = 'pulse 2s infinite';
+                }
+            });
+        }
+        
+        // 少し遅延してから自動再生を試行
+        setTimeout(attemptAutoplay, 100);
     }
 });
+
+// ボタンのパルスアニメーション用CSS（JavaScriptで動的に追加）
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes pulse {
+        0%, 100% {
+            transform: translate(-50%, -50%) scale(1);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+        50% {
+            transform: translate(-50%, -50%) scale(1.05);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.6);
+        }
+    }
+`;
+document.head.appendChild(style);
